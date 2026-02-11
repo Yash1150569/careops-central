@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { addContact, addBooking, getMessages, sendMessage, addFormResponse } from '@/lib/data';
+import { addContact, addBooking, getMessages, sendMessage, submitPublicForm as submitPublicFormToApi } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
 
 const contactSchema = z.object({
@@ -78,7 +78,8 @@ type FormResponseValues = z.infer<typeof formResponseSchema>;
 export async function submitPublicForm(data: FormResponseValues) {
     try {
         const validatedData = formResponseSchema.parse(data);
-        await addFormResponse(validatedData);
+        await submitPublicFormToApi(validatedData);
+        revalidatePath('/forms');
         return { success: true, message: 'Form submitted successfully. Check your email for a confirmation.' };
     } catch (error) {
         if (error instanceof z.ZodError) {
