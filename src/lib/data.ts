@@ -44,43 +44,19 @@ async function handleFetch(url: string, options: RequestInit = {}, mockData: any
 // --- Data Fetching Functions ---
 
 export async function fetchDashboardData(workspaceId: number = 1) {
-  if (!API_URL) {
-    return {
-      bookings: mockBookings.length,
-      alerts: mockAlerts,
-      contactsCount: mockContacts.length,
-    };
-  }
+  // This implementation reuses the more robust individual fetching functions,
+  // which already have a fallback mechanism.
+  const [bookingsData, alertsData, contactsData] = await Promise.all([
+    getBookings(workspaceId),
+    getAlerts(workspaceId),
+    getContacts(workspaceId),
+  ]);
 
-  try {
-    const [bookingsRes, contactsRes, alertsRes] = await Promise.all([
-      fetch(`${API_URL}/bookings?workspace_id=${workspaceId}`, { cache: 'no-store' }),
-      fetch(`${API_URL}/contacts?workspace_id=${workspaceId}`, { cache: 'no-store' }),
-      fetch(`${API_URL}/alerts?workspace_id=${workspaceId}`, { cache: 'no-store' })
-    ]);
-
-    if (!bookingsRes.ok || !contactsRes.ok || !alertsRes.ok) {
-      throw new Error('Failed to fetch one or more dashboard data endpoints.');
-    }
-
-    const bookings = await bookingsRes.json();
-    const contacts = await contactsRes.json();
-    const alerts = await alertsRes.json();
-    
-    return {
-      bookings: Array.isArray(bookings) ? bookings.length : 0,
-      alerts: Array.isArray(alerts) ? alerts : [],
-      contactsCount: Array.isArray(contacts) ? contacts.length : 0,
-    };
-
-  } catch (error) {
-      console.error("Failed to fetch from API, falling back to mock data for dashboard.", error);
-      return {
-        bookings: mockBookings.length,
-        alerts: mockAlerts,
-        contactsCount: mockContacts.length,
-      };
-  }
+  return {
+    bookings: bookingsData.length,
+    alerts: alertsData,
+    contactsCount: contactsData.length,
+  };
 }
 
 export async function getContacts(workspaceId: number = 1): Promise<Contact[]> {
@@ -90,6 +66,9 @@ export async function getContacts(workspaceId: number = 1): Promise<Contact[]> {
 export async function getBookings(workspaceId: number = 1): Promise<Booking[]> {
     const data = await handleFetch(`${API_URL}/bookings?workspace_id=${workspaceId}`, {}, mockBookings);
     // The API might not return enriched data, so let's enrich it here for consistency
+    if (!Array.isArray(data)) {
+        return [];
+    }
     return data.map((booking: Booking) => ({
         ...booking,
         contact: mockContacts.find(c => c.id === booking.contact_id),
@@ -107,6 +86,9 @@ export async function getAlerts(workspaceId: number = 1): Promise<Alert[]> {
 
 export async function getInbox(workspaceId: number = 1): Promise<EnrichedConversation[]> {
     const conversations: {id: number, name: string}[] = await handleFetch(`${API_URL}/inbox`, {}, mockConversations.map(c => ({id: c.id, name: mockContacts.find(ct => ct.id === c.contact_id)?.name || "Unknown"})));
+    if (!Array.isArray(conversations)) {
+        return [];
+    }
     return conversations.map((conv) => {
         const contact = mockContacts.find(c => c.name === conv.name);
         return {
