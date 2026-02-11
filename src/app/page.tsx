@@ -19,13 +19,8 @@ import { fetchDashboardData } from "@/lib/data";
 import type { Alert } from "@/lib/definitions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  createContact,
-  createBooking,
-} from "@/app/actions";
-import { CreateContactDialog } from "@/components/create-contact-dialog";
-import { CreateBookingDialog } from "@/components/create-booking-dialog";
 import { getContacts } from "@/lib/data";
+import { QuickActions } from "@/components/quick-actions";
 
 export default async function DashboardPage() {
   const { bookings, alerts, contactsCount } = await fetchDashboardData();
@@ -78,11 +73,7 @@ export default async function DashboardPage() {
             <Bot className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="flex flex-col items-start gap-2">
-            <CreateContactDialog createContactAction={createContact} />
-            <CreateBookingDialog
-              createBookingAction={createBooking}
-              contacts={contacts}
-            />
+            <QuickActions contacts={contacts} />
           </CardContent>
         </Card>
       </div>
