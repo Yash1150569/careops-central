@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -5,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 function Integration({
   title,
@@ -30,6 +33,8 @@ function Integration({
 }
 
 export default function Settings() {
+  const router = useRouter();
+
   return (
     <div className="p-4 sm:p-10 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">Workspace Settings</h1>
@@ -65,7 +70,7 @@ export default function Settings() {
           <p className="text-muted-foreground mb-4">
             Define your service types, durations, and availability.
           </p>
-          <Button>Manage Booking Types</Button>
+          <Button onClick={() => router.push("/booking-types")}>Manage Booking Types</Button>
         </CardContent>
       </Card>
 
@@ -77,7 +82,7 @@ export default function Settings() {
           <p className="text-muted-foreground mb-4">
             Forms sent automatically after a booking is confirmed.
           </p>
-          <Button>Manage Forms</Button>
+          <Button onClick={() => router.push("/forms")}>Manage Forms</Button>
         </CardContent>
       </Card>
 

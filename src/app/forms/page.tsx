@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -5,8 +7,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function FormsPage() {
+  const router = useRouter();
+  
   return (
     <div className="p-4 sm:p-10">
       <h1 className="text-3xl font-bold mb-2">Post-Booking Forms</h1>
@@ -24,7 +29,7 @@ export default function FormsPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Linked to: Initial Consultation
             </p>
-            <Button>Preview Form</Button>
+            <Button onClick={() => router.push('/public/form')}>Preview Form</Button>
           </CardContent>
         </Card>
 
@@ -37,7 +42,7 @@ export default function FormsPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Linked to: All Booking Types
             </p>
-            <Button>Preview Form</Button>
+            <Button onClick={() => router.push('/public/form')}>Preview Form</Button>
           </CardContent>
         </Card>
       </div>
