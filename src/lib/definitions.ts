@@ -39,7 +39,7 @@ export type Message = {
 
 export type BookingType = {
   id: number;
-  workspace_id: number;
+  workspace_id: 1;
   name: string;
   duration: number;
 };
@@ -67,6 +67,14 @@ export type FormSubmission = {
   status: "pending" | "reviewed";
   form?: Form;
   contact?: Contact;
+};
+
+export type FormResponse = {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
 };
 
 

@@ -9,6 +9,7 @@ import {
   Message,
   Form,
   FormSubmission,
+  FormResponse,
 } from "./definitions";
 
 // Simulate a database
@@ -81,6 +82,7 @@ let mockForms: Form[] = [
 ];
 
 let mockFormSubmissions: FormSubmission[] = [];
+let mockFormResponses: FormResponse[] = [];
 
 
 const simulateDelay = (ms: number) =>
@@ -224,4 +226,35 @@ export async function sendMessage(conversation_id: number, body: string) {
     console.log("Automation stopped for this conversation");
     console.log(`[API SIM] Message sent:`, newMessage);
     return newMessage;
+}
+
+export async function addFormResponse(response: { name: string; email: string; message: string; }) {
+  await simulateDelay(500);
+  const newId = (mockFormResponses[mockFormResponses.length - 1]?.id || 0) + 1;
+  const newResponse: FormResponse = {
+    id: newId,
+    ...response,
+    created_at: new Date().toISOString(),
+  };
+  mockFormResponses.push(newResponse);
+  
+  // Simulate saving to DB
+  console.log(`[API SIM] Form Response saved to DB:`, newResponse);
+  
+  // Simulate sending email
+  console.log(`[EMAIL SIM] Sending email to ${response.email}`);
+  console.log(`[EMAIL SIM] Subject: Thank you for submitting the form`);
+  const body = `
+Hello ${response.name},
+
+We received your submission:
+
+Message:
+${response.message}
+
+Our team will contact you shortly.
+    `;
+  console.log(`[EMAIL SIM] Body: ${body}`);
+
+  return newResponse;
 }

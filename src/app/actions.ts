@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { addContact, addBooking, getMessages, sendMessage } from '@/lib/data';
+import { addContact, addBooking, getMessages, sendMessage, addFormResponse } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
 
 const contactSchema = z.object({
@@ -65,4 +65,25 @@ export async function sendMessageAction(conversationId: number, body: string) {
     const message = await sendMessage(conversationId, body);
     revalidatePath(`/inbox`); // This might not be enough, client-side state update is better
     return message;
+}
+
+const formResponseSchema = z.object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    email: z.string().email({ message: "Please enter a valid email." }),
+    message: z.string().min(10, { message: "Message must be at least 10 characters." }),
+});
+
+type FormResponseValues = z.infer<typeof formResponseSchema>;
+
+export async function submitPublicForm(data: FormResponseValues) {
+    try {
+        const validatedData = formResponseSchema.parse(data);
+        await addFormResponse(validatedData);
+        return { success: true, message: 'Form submitted successfully. Check your email for a confirmation.' };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return { success: false, message: error.errors.map(e => e.message).join(', ') };
+        }
+        return { success: false, message: 'An unexpected error occurred.' };
+    }
 }
