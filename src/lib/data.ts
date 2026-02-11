@@ -1,3 +1,4 @@
+
 import "server-only";
 import {
   Contact,
@@ -31,7 +32,6 @@ async function handleFetch(endpoint: string, options: RequestInit = {}, mockData
     const response = await fetch(url, { ...options, cache: 'no-store' });
 
     if (!response.ok) {
-      console.error(`API Error: ${response.status} ${response.statusText} for ${url}. Falling back to mock data.`);
       return mockData;
     }
 
@@ -42,11 +42,9 @@ async function handleFetch(endpoint: string, options: RequestInit = {}, mockData
     try {
       return await response.json();
     } catch (error) {
-      console.error(`JSON parsing error for ${url}. Falling back to mock data.`, error);
       return mockData;
     }
   } catch (error) {
-    console.error(`Network error calling ${url}. Falling back to mock data.`, error);
     return mockData;
   }
 }
