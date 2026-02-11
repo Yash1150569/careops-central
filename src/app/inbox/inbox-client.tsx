@@ -117,11 +117,12 @@ export function InboxClient({ initialConversations }: InboxClientProps) {
                                 ) : (
                                     messages.map(msg => (
                                         <div key={msg.id} className={cn('flex items-end gap-2', msg.sender === 'staff' ? 'justify-end' : 'justify-start')}>
-                                            {msg.sender !== 'staff' && <Avatar className="h-8 w-8"><AvatarFallback>{msg.sender.charAt(0)}</AvatarFallback></Avatar>}
+                                            {msg.sender !== 'staff' && <Avatar className="h-8 w-8"><AvatarFallback>{selectedConversation.contact?.name?.charAt(0)}</AvatarFallback></Avatar>}
                                             <div className={cn('rounded-lg p-3 max-w-xs lg:max-w-md shadow-sm', msg.sender === 'staff' ? 'bg-primary text-primary-foreground' : 'bg-card')}>
                                                 <p className="text-sm">{msg.body}</p>
                                                 <p className="text-xs text-right mt-1 opacity-70">{format(new Date(msg.created_at), 'p')}</p>
                                             </div>
+                                            {msg.sender === 'staff' && <Avatar className="h-8 w-8"><AvatarFallback>S</AvatarFallback></Avatar>}
                                         </div>
                                     ))
                                 )}

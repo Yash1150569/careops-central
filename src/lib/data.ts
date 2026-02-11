@@ -134,13 +134,13 @@ export async function getInbox(workspaceId: number = 1) {
     const conversationsWithContact = mockConversations.map(conv => ({
         ...conv,
         contact: mockContacts.find(c => c.id === conv.contact_id)
-    }));
+    })).sort((a, b) => b.id - a.id);
     return conversationsWithContact;
 }
 
 export async function getMessages(conversationId: number) {
     await simulateDelay(150);
-    return mockMessages.filter(m => m.conversation_id === conversationId);
+    return mockMessages.filter(m => m.conversation_id === conversationId).sort((a,b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 }
 
 export async function getFormSubmissions(workspaceId: number = 1) {
@@ -211,6 +211,7 @@ export async function addBooking(booking: {
 export async function sendMessage(conversation_id: number, body: string) {
     await simulateDelay(100);
     const newId = (mockMessages[mockMessages.length - 1]?.id || 0) + 1;
+    const contact = mockContacts.find(c => c.id === mockConversations.find(conv => conv.id === conversation_id)?.contact_id);
     const newMessage: Message = {
         id: newId,
         conversation_id,
