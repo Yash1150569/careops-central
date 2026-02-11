@@ -25,18 +25,31 @@ async function handleFetch(url: string, options: RequestInit = {}, mockData: any
   if (!API_URL) {
     return mockData;
   }
+
+  const response = await fetch(url, { ...options, cache: 'no-store' }).catch(
+    (error) => {
+      console.error(`Network error calling ${url}. Falling back to mock data.`, error);
+      return null; // Return null on network error
+    }
+  );
+
+  if (!response) {
+    return mockData; // Fallback if fetch itself failed
+  }
+
+  if (!response.ok) {
+    console.error(`API Error: ${response.status} ${response.statusText} for ${url}. Falling back to mock data.`);
+    return mockData;
+  }
+
+  if (response.status === 204) {
+    return options.method === 'POST' ? { success: true } : [];
+  }
+  
   try {
-    const response = await fetch(url, { ...options, cache: "no-store" });
-    if (!response.ok) {
-      console.error(`API Error: ${response.status} ${response.statusText} for ${url}. Falling back to mock data.`);
-      return mockData;
-    }
-    if (response.status === 204) {
-      return options.method === 'POST' ? { success: true } : [];
-    }
-    return response.json();
+    return await response.json();
   } catch (error) {
-    console.error(`Network Error calling ${url}. Falling back to mock data.`, error);
+    console.error(`JSON parsing error for ${url}. Falling back to mock data.`, error);
     return mockData;
   }
 }
