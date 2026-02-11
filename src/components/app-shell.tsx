@@ -27,25 +27,43 @@ import {
   Calendar,
   Bot,
   LogOut,
-  Settings,
   Menu,
   ChevronsLeft,
-  ChevronsRight,
+  MessageSquare,
+  FolderKanban,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
+import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
   { href: "/contacts", label: "Contacts", icon: Users },
   { href: "/bookings", label: "Bookings", icon: Calendar },
+  { href: "/inbox", label: "Inbox", icon: MessageSquare },
+  { href: "/forms", label: "Forms", icon: FolderKanban },
   { href: "/ai-responder", label: "AI Responder", icon: Bot },
 ];
 
+const settingsNavItems = [
+    { href: "/settings", label: "Settings", icon: SettingsIcon },
+]
+
 function AppSidebar() {
   const pathname = usePathname();
-  const { state, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
+    toast({ title: "Logged Out", description: "You have been successfully logged out." });
+    router.push("/login");
+  };
 
   return (
     <Sidebar
@@ -89,7 +107,7 @@ function AppSidebar() {
           <ChevronsLeft />
         </Button>
       </SidebarHeader>
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-2 flex-1">
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuButton
@@ -104,6 +122,23 @@ function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           ))}
+        </SidebarMenu>
+      </SidebarContent>
+       <SidebarContent className="p-2">
+        <SidebarMenu>
+            {settingsNavItems.map((item) => (
+                <SidebarMenuButton
+                key={item.href}
+                asChild
+                isActive={pathname === item.href}
+                tooltip={{ children: item.label }}
+                >
+                <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                </Link>
+                </SidebarMenuButton>
+            ))}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-3 border-t">
@@ -135,11 +170,11 @@ function AppSidebar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
+            <DropdownMenuItem onClick={() => router.push('/settings')}>
+              <SettingsIcon className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>
@@ -151,7 +186,7 @@ function AppSidebar() {
 }
 
 function AppHeader({ children }: { children: React.ReactNode }) {
-  const { isMobile, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Button
@@ -169,6 +204,12 @@ function AppHeader({ children }: { children: React.ReactNode }) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+
+    if (pathname === '/login' || pathname.startsWith('/public/')) {
+        return <main className="flex-1 p-4 sm:px-6">{children}</main>;
+    }
+
   return (
     <>
       <AppSidebar />

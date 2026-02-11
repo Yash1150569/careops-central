@@ -11,7 +11,7 @@ export type User = {
   workspace_id: number;
   name: string;
   email: string;
-  role: string;
+  role: "Owner" | "Staff";
 };
 
 export type Contact = {
@@ -25,13 +25,14 @@ export type Contact = {
 export type Conversation = {
   id: number;
   contact_id: number;
+  contact?: Contact;
 };
 
 export type Message = {
   id: number;
   conversation_id: number;
   body: string;
-  direction: "inbound" | "outbound";
+  sender: string; // "staff" or contact name
   is_auto: boolean;
   created_at: string;
 };
@@ -64,7 +65,10 @@ export type FormSubmission = {
   form_id: number;
   contact_id: number;
   status: "pending" | "reviewed";
+  form?: Form;
+  contact?: Contact;
 };
+
 
 export type InventoryItem = {
   id: number;

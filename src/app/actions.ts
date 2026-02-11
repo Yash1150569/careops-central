@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { addContact, addBooking } from '@/lib/data';
+import { addContact, addBooking, getMessages, sendMessage } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
 
 const contactSchema = z.object({
@@ -18,6 +18,7 @@ export async function createContact(data: ContactFormValues) {
         await addContact(validatedData);
         revalidatePath('/');
         revalidatePath('/contacts');
+        revalidatePath('/inbox');
         return { success: true, message: 'Contact created successfully.' };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -45,6 +46,7 @@ export async function createBooking(data: BookingFormValues) {
         });
         revalidatePath('/');
         revalidatePath('/bookings');
+        revalidatePath('/forms');
         return { success: true, message: 'Booking created successfully.' };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -53,4 +55,14 @@ export async function createBooking(data: BookingFormValues) {
         console.error(error);
         return { success: false, message: 'An unexpected error occurred.' };
     }
+}
+
+export async function getMessagesAction(conversationId: number) {
+    return getMessages(conversationId);
+}
+
+export async function sendMessageAction(conversationId: number, body: string) {
+    const message = await sendMessage(conversationId, body);
+    revalidatePath(`/inbox`); // This might not be enough, client-side state update is better
+    return message;
 }
