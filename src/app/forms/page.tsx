@@ -1,87 +1,46 @@
-import { getFormSubmissions } from "@/lib/data";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { FolderKanban } from "lucide-react";
-import type { FormSubmission } from "@/lib/definitions";
+import { Button } from "@/components/ui/button";
 
-export default async function FormsPage() {
-  const submissions = await getFormSubmissions();
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "default";
-      case "reviewed":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
+export default function FormsPage() {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <FolderKanban className="h-5 w-5" />
-              Form Submissions
-            </CardTitle>
-            <CardDescription>
-              Track and review form submissions from your contacts.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Contact</TableHead>
-              <TableHead>Form</TableHead>
-              <TableHead className="text-right">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {submissions.length > 0 ? (
-              submissions.map((sub: FormSubmission) => (
-                <TableRow key={sub.id}>
-                  <TableCell className="font-medium">{sub.contact?.name}</TableCell>
-                  <TableCell>{sub.form?.name}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={getStatusVariant(sub.status) as any} className="capitalize">
-                      {sub.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No form submissions found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="p-4 sm:p-10">
+      <h1 className="text-3xl font-bold mb-2">Post-Booking Forms</h1>
+      <p className="text-muted-foreground mb-8">
+        These forms are automatically sent to customers after booking.
+      </p>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Intake Form</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Status: Active</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Linked to: Initial Consultation
+            </p>
+            <Button>Preview Form</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Agreement Form</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Status: Active</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Linked to: All Booking Types
+            </p>
+            <Button>Preview Form</Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

@@ -36,7 +36,6 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
-import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -55,14 +54,12 @@ function AppSidebar() {
   const pathname = usePathname();
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
-  const { toast } = useToast();
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
+      window.location.href = "/login";
     }
-    toast({ title: "Logged Out", description: "You have been successfully logged out." });
-    router.push("/login");
   };
 
   return (
